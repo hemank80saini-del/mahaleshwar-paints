@@ -1,9 +1,11 @@
 // ====================== APP.JSX ======================
 
+import "./App.css";
 import { useState } from "react";
 
-export default function App() {
+function App() {
   // ================= PAINT =================
+
   const [paintName, setPaintName] = useState("");
   const [paintQty, setPaintQty] = useState("");
   const [paintPrice, setPaintPrice] = useState("");
@@ -12,6 +14,7 @@ export default function App() {
   const [paintData, setPaintData] = useState([]);
 
   // ================= TIMBER =================
+
   const [timberName, setTimberName] = useState("");
   const [timberQty, setTimberQty] = useState("");
   const [timberPrice, setTimberPrice] = useState("");
@@ -20,6 +23,7 @@ export default function App() {
   const [timberData, setTimberData] = useState([]);
 
   // ================= CUSTOMER =================
+
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerAmount, setCustomerAmount] = useState("");
@@ -73,13 +77,14 @@ export default function App() {
     )
       return;
 
-    const pending = Number(customerAmount) - Number(paidAmount);
+    const pending =
+      Number(customerAmount) - Number(paidAmount);
 
     const newCustomer = {
       serial: customerData.length + 1,
       name: customerName,
       phone: customerPhone,
-      amount: customerAmount,
+      total: customerAmount,
       paid: paidAmount,
       pending: pending,
     };
@@ -92,18 +97,25 @@ export default function App() {
     setPaidAmount("");
   };
 
-  // ================= SEARCH FILTER =================
+  // ================= FILTERS =================
 
   const filteredPaint = paintData.filter((item) =>
-    item.name.toLowerCase().includes(paintSearch.toLowerCase())
+    item.name
+      .toLowerCase()
+      .includes(paintSearch.toLowerCase())
   );
 
   const filteredTimber = timberData.filter((item) =>
-    item.name.toLowerCase().includes(timberSearch.toLowerCase())
+    item.name
+      .toLowerCase()
+      .includes(timberSearch.toLowerCase())
   );
 
-  const filteredCustomer = customerData.filter((item) =>
-    item.name.toLowerCase().includes(customerSearch.toLowerCase())
+  const filteredCustomer = customerData.filter(
+    (item) =>
+      item.name
+        .toLowerCase()
+        .includes(customerSearch.toLowerCase())
   );
 
   // ================= TOTALS =================
@@ -117,38 +129,32 @@ export default function App() {
   );
 
   return (
-    <div style={styles.container}>
+    <div className="main-container">
       {/* ================= SIDEBAR ================= */}
 
-      <div style={styles.sidebar}>
+      <div className="sidebar">
         <img
           src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
           alt=""
-          style={styles.sidebarImage}
         />
 
-        <h1 style={styles.sidebarTitle}>
+        <h1>
           MAHALESHWAR PAINTS AND TIMBERS
         </h1>
 
-        <h2 style={styles.owner}>SATISH SAINI</h2>
+        <h2>SATISH SAINI</h2>
 
-        <button style={styles.sidebarBtn}>
-          Dashboard
-        </button>
-
-        <button style={styles.sidebarBtn}>
-          Customers
-        </button>
+        <button>Dashboard</button>
+        <button>Customers</button>
       </div>
 
       {/* ================= MAIN ================= */}
 
-      <div style={styles.main}>
+      <div className="main-content">
         {/* HEADER */}
 
-        <div style={styles.header}>
-          <h1 style={styles.headerTitle}>
+        <div className="header">
+          <h1>
             MAHALESHWAR PAINTS AND TIMBERS
           </h1>
 
@@ -161,27 +167,25 @@ export default function App() {
 
         {/* SECTION CARDS */}
 
-        <div style={styles.cardContainer}>
-          <div style={styles.card}>
+        <div className="cards">
+          <div className="card">
             <img
               src="https://images.unsplash.com/photo-1504307651254-35680f356dfd"
               alt=""
-              style={styles.cardImage}
             />
 
-            <button style={styles.paintBtn}>
+            <button className="paint-btn">
               🎨 Paint Section
             </button>
           </div>
 
-          <div style={styles.card}>
+          <div className="card">
             <img
               src="https://images.unsplash.com/photo-1513694203232-719a280e022f"
               alt=""
-              style={styles.cardImage}
             />
 
-            <button style={styles.timberBtn}>
+            <button className="timber-btn">
               🪵 Timber Section
             </button>
           </div>
@@ -189,18 +193,18 @@ export default function App() {
 
         {/* TOTAL BOXES */}
 
-        <div style={styles.totalContainer}>
-          <div style={styles.totalBoxBlue}>
+        <div className="total-boxes">
+          <div className="total-box">
             <h2>Total Products</h2>
             <h1>{totalProducts}</h1>
           </div>
 
-          <div style={styles.totalBoxGreen}>
+          <div className="total-box">
             <h2>Customers</h2>
             <h1>{customerData.length}</h1>
           </div>
 
-          <div style={styles.totalBoxRed}>
+          <div className="total-box">
             <h2>Pending Payment</h2>
             <h1>₹{totalPending}</h1>
           </div>
@@ -208,66 +212,60 @@ export default function App() {
 
         {/* ================= PAINT SECTION ================= */}
 
-        <div style={styles.section}>
-          <h1 style={styles.blueHeading}>
+        <div className="section">
+          <h1 className="section-title paint-title">
             🎨 Paint Section
           </h1>
-
-          {/* SEARCH */}
 
           <input
             type="text"
             placeholder="Search Paint..."
+            className="search"
             value={paintSearch}
             onChange={(e) =>
               setPaintSearch(e.target.value)
             }
-            style={styles.search}
           />
-
-          {/* INPUTS */}
 
           <input
             type="text"
             placeholder="Paint Name"
+            className="input"
             value={paintName}
             onChange={(e) =>
               setPaintName(e.target.value)
             }
-            style={styles.input}
           />
 
           <input
             type="number"
             placeholder="Quantity"
+            className="input"
             value={paintQty}
             onChange={(e) =>
               setPaintQty(e.target.value)
             }
-            style={styles.input}
           />
 
           <input
             type="number"
             placeholder="Price"
+            className="input"
             value={paintPrice}
             onChange={(e) =>
               setPaintPrice(e.target.value)
             }
-            style={styles.input}
           />
 
           <button
+            className="save-btn"
             onClick={savePaint}
-            style={styles.saveBtn}
           >
             Save Paint
           </button>
 
-          {/* TABLE */}
-
-          <div style={styles.tableWrapper}>
-            <table style={styles.table}>
+          <div className="table-wrapper">
+            <table>
               <thead>
                 <tr>
                   <th>Sr No.</th>
@@ -293,66 +291,60 @@ export default function App() {
 
         {/* ================= TIMBER SECTION ================= */}
 
-        <div style={styles.section}>
-          <h1 style={styles.orangeHeading}>
+        <div className="section">
+          <h1 className="section-title timber-title">
             🪵 Timber Section
           </h1>
-
-          {/* SEARCH */}
 
           <input
             type="text"
             placeholder="Search Timber..."
+            className="search"
             value={timberSearch}
             onChange={(e) =>
               setTimberSearch(e.target.value)
             }
-            style={styles.search}
           />
-
-          {/* INPUTS */}
 
           <input
             type="text"
             placeholder="Timber Name"
+            className="input"
             value={timberName}
             onChange={(e) =>
               setTimberName(e.target.value)
             }
-            style={styles.input}
           />
 
           <input
             type="number"
             placeholder="Quantity"
+            className="input"
             value={timberQty}
             onChange={(e) =>
               setTimberQty(e.target.value)
             }
-            style={styles.input}
           />
 
           <input
             type="number"
             placeholder="Price"
+            className="input"
             value={timberPrice}
             onChange={(e) =>
               setTimberPrice(e.target.value)
             }
-            style={styles.input}
           />
 
           <button
+            className="save-btn"
             onClick={saveTimber}
-            style={styles.saveBtn}
           >
             Save Timber
           </button>
 
-          {/* TABLE */}
-
-          <div style={styles.tableWrapper}>
-            <table style={styles.table}>
+          <div className="table-wrapper">
+            <table>
               <thead>
                 <tr>
                   <th>Sr No.</th>
@@ -378,76 +370,70 @@ export default function App() {
 
         {/* ================= CUSTOMER SECTION ================= */}
 
-        <div style={styles.section}>
-          <h1 style={styles.greenHeading}>
-            👨 Customer Section
+        <div className="section">
+          <h1 className="section-title customer-title">
+            👨 Customers
           </h1>
-
-          {/* SEARCH */}
 
           <input
             type="text"
             placeholder="Search Customer..."
+            className="search"
             value={customerSearch}
             onChange={(e) =>
               setCustomerSearch(e.target.value)
             }
-            style={styles.search}
           />
-
-          {/* INPUTS */}
 
           <input
             type="text"
             placeholder="Customer Name"
+            className="input"
             value={customerName}
             onChange={(e) =>
               setCustomerName(e.target.value)
             }
-            style={styles.input}
           />
 
           <input
             type="number"
             placeholder="Phone Number"
+            className="input"
             value={customerPhone}
             onChange={(e) =>
               setCustomerPhone(e.target.value)
             }
-            style={styles.input}
           />
 
           <input
             type="number"
             placeholder="Total Amount"
+            className="input"
             value={customerAmount}
             onChange={(e) =>
               setCustomerAmount(e.target.value)
             }
-            style={styles.input}
           />
 
           <input
             type="number"
             placeholder="Paid Amount"
+            className="input"
             value={paidAmount}
             onChange={(e) =>
               setPaidAmount(e.target.value)
             }
-            style={styles.input}
           />
 
           <button
+            className="save-btn"
             onClick={saveCustomer}
-            style={styles.saveBtn}
           >
             Save Customer
           </button>
 
-          {/* TABLE */}
-
-          <div style={styles.tableWrapper}>
-            <table style={styles.table}>
+          <div className="table-wrapper">
+            <table>
               <thead>
                 <tr>
                   <th>Sr No.</th>
@@ -460,16 +446,18 @@ export default function App() {
               </thead>
 
               <tbody>
-                {filteredCustomer.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.serial}</td>
-                    <td>{item.name}</td>
-                    <td>{item.phone}</td>
-                    <td>₹{item.amount}</td>
-                    <td>₹{item.paid}</td>
-                    <td>₹{item.pending}</td>
-                  </tr>
-                ))}
+                {filteredCustomer.map(
+                  (item, index) => (
+                    <tr key={index}>
+                      <td>{item.serial}</td>
+                      <td>{item.name}</td>
+                      <td>{item.phone}</td>
+                      <td>₹{item.total}</td>
+                      <td>₹{item.paid}</td>
+                      <td>₹{item.pending}</td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </table>
           </div>
@@ -479,219 +467,4 @@ export default function App() {
   );
 }
 
-// ====================== STYLES ======================
-
-const styles = {
-  container: {
-    display: "flex",
-    minHeight: "100vh",
-    background: "#0f172a",
-    fontFamily: "Arial",
-  },
-
-  sidebar: {
-    width: "300px",
-    background: "#1e3a8a",
-    padding: "20px",
-    color: "white",
-    textAlign: "center",
-  },
-
-  sidebarImage: {
-    width: "100%",
-    borderRadius: "20px",
-  },
-
-  sidebarTitle: {
-    marginTop: "20px",
-    fontSize: "38px",
-    fontWeight: "bold",
-  },
-
-  owner: {
-    marginTop: "20px",
-  },
-
-  sidebarBtn: {
-    width: "100%",
-    padding: "15px",
-    marginTop: "20px",
-    borderRadius: "12px",
-    border: "none",
-    background: "#2563eb",
-    color: "white",
-    fontSize: "20px",
-    fontWeight: "bold",
-    cursor: "pointer",
-  },
-
-  main: {
-    flex: 1,
-    background: "#e5e7eb",
-    padding: "20px",
-  },
-
-  header: {
-    background:
-      "linear-gradient(to right,#2563eb,#d97706)",
-    padding: "30px",
-    borderRadius: "20px",
-    color: "white",
-    textAlign: "center",
-  },
-
-  headerTitle: {
-    fontSize: "48px",
-  },
-
-  cardContainer: {
-    display: "flex",
-    gap: "20px",
-    marginTop: "30px",
-    flexWrap: "wrap",
-  },
-
-  card: {
-    position: "relative",
-    width: "350px",
-  },
-
-  cardImage: {
-    width: "100%",
-    height: "300px",
-    objectFit: "cover",
-    borderRadius: "20px",
-  },
-
-  paintBtn: {
-    position: "absolute",
-    bottom: "20px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    padding: "15px 30px",
-    border: "none",
-    borderRadius: "15px",
-    background: "#2563eb",
-    color: "white",
-    fontSize: "24px",
-    fontWeight: "bold",
-  },
-
-  timberBtn: {
-    position: "absolute",
-    bottom: "20px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    padding: "15px 30px",
-    border: "none",
-    borderRadius: "15px",
-    background: "#d97706",
-    color: "white",
-    fontSize: "24px",
-    fontWeight: "bold",
-  },
-
-  totalContainer: {
-    display: "flex",
-    gap: "20px",
-    marginTop: "30px",
-    flexWrap: "wrap",
-  },
-
-  totalBoxBlue: {
-    flex: 1,
-    minWidth: "220px",
-    background: "white",
-    padding: "30px",
-    borderRadius: "20px",
-    borderTop: "6px solid #2563eb",
-    textAlign: "center",
-  },
-
-  totalBoxGreen: {
-    flex: 1,
-    minWidth: "220px",
-    background: "white",
-    padding: "30px",
-    borderRadius: "20px",
-    borderTop: "6px solid #059669",
-    textAlign: "center",
-  },
-
-  totalBoxRed: {
-    flex: 1,
-    minWidth: "220px",
-    background: "white",
-    padding: "30px",
-    borderRadius: "20px",
-    borderTop: "6px solid red",
-    textAlign: "center",
-  },
-
-  section: {
-    background: "white",
-    marginTop: "40px",
-    padding: "30px",
-    borderRadius: "20px",
-  },
-
-  blueHeading: {
-    color: "#2563eb",
-    fontSize: "45px",
-    textAlign: "center",
-  },
-
-  orangeHeading: {
-    color: "#d97706",
-    fontSize: "45px",
-    textAlign: "center",
-  },
-
-  greenHeading: {
-    color: "#059669",
-    fontSize: "45px",
-    textAlign: "center",
-  },
-
-  search: {
-    width: "100%",
-    padding: "15px",
-    marginTop: "20px",
-    borderRadius: "10px",
-    border: "2px solid #cbd5e1",
-    fontSize: "18px",
-    boxSizing: "border-box",
-  },
-
-  input: {
-    width: "100%",
-    padding: "15px",
-    marginTop: "20px",
-    borderRadius: "10px",
-    border: "2px solid #cbd5e1",
-    fontSize: "18px",
-    boxSizing: "border-box",
-  },
-
-  saveBtn: {
-    marginTop: "20px",
-    padding: "15px 30px",
-    border: "none",
-    borderRadius: "12px",
-    background: "green",
-    color: "white",
-    fontSize: "20px",
-    fontWeight: "bold",
-    cursor: "pointer",
-  },
-
-  tableWrapper: {
-    overflowX: "auto",
-    marginTop: "30px",
-  },
-
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-};
+export default App;
