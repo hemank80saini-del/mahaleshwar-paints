@@ -1,718 +1,697 @@
-import React, { useState, useEffect } from "react";
+// ====================== APP.JSX ======================
+
+import { useState } from "react";
 
 export default function App() {
-  const BUSINESS_NAME = "MAHALESHWAR PAINTS AND TIMBERS";
-  const OWNER = "SATISH SAINI";
-  const PHONE = "+91 9828087208";
-  const LOCATION = "Jaipur";
+  // ================= PAINT =================
+  const [paintName, setPaintName] = useState("");
+  const [paintQty, setPaintQty] = useState("");
+  const [paintPrice, setPaintPrice] = useState("");
+  const [paintSearch, setPaintSearch] = useState("");
 
-  const [page, setPage] = useState("dashboard");
+  const [paintData, setPaintData] = useState([]);
 
-  const [paints, setPaints] = useState([]);
-  const [timbers, setTimbers] = useState([]);
-  const [customers, setCustomers] = useState([]);
+  // ================= TIMBER =================
+  const [timberName, setTimberName] = useState("");
+  const [timberQty, setTimberQty] = useState("");
+  const [timberPrice, setTimberPrice] = useState("");
+  const [timberSearch, setTimberSearch] = useState("");
 
-  const [paintForm, setPaintForm] = useState({
-    name: "",
-    quantity: "",
-    price: "",
-  });
+  const [timberData, setTimberData] = useState([]);
 
-  const [timberForm, setTimberForm] = useState({
-    name: "",
-    quantity: "",
-    price: "",
-  });
+  // ================= CUSTOMER =================
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerAmount, setCustomerAmount] = useState("");
+  const [paidAmount, setPaidAmount] = useState("");
+  const [customerSearch, setCustomerSearch] = useState("");
 
-  const [customerForm, setCustomerForm] = useState({
-    name: "",
-    phone: "",
-    pending: "",
-  });
+  const [customerData, setCustomerData] = useState([]);
 
-  useEffect(() => {
-    setPaints(JSON.parse(localStorage.getItem("paints")) || []);
-    setTimbers(JSON.parse(localStorage.getItem("timbers")) || []);
-    setCustomers(JSON.parse(localStorage.getItem("customers")) || []);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("paints", JSON.stringify(paints));
-  }, [paints]);
-
-  useEffect(() => {
-    localStorage.setItem("timbers", JSON.stringify(timbers));
-  }, [timbers]);
-
-  useEffect(() => {
-    localStorage.setItem("customers", JSON.stringify(customers));
-  }, [customers]);
-
-  const totalProducts = paints.length + timbers.length;
-
-  const totalPending = customers.reduce(
-    (acc, cur) => acc + Number(cur.pending || 0),
-    0
-  );
+  // ================= SAVE FUNCTIONS =================
 
   const savePaint = () => {
-    if (!paintForm.name) return;
+    if (!paintName || !paintQty || !paintPrice) return;
 
-    setPaints([...paints, paintForm]);
+    const newPaint = {
+      serial: paintData.length + 1,
+      name: paintName,
+      qty: paintQty,
+      price: paintPrice,
+    };
 
-    setPaintForm({
-      name: "",
-      quantity: "",
-      price: "",
-    });
+    setPaintData([...paintData, newPaint]);
+
+    setPaintName("");
+    setPaintQty("");
+    setPaintPrice("");
   };
 
   const saveTimber = () => {
-    if (!timberForm.name) return;
+    if (!timberName || !timberQty || !timberPrice) return;
 
-    setTimbers([...timbers, timberForm]);
+    const newTimber = {
+      serial: timberData.length + 1,
+      name: timberName,
+      qty: timberQty,
+      price: timberPrice,
+    };
 
-    setTimberForm({
-      name: "",
-      quantity: "",
-      price: "",
-    });
+    setTimberData([...timberData, newTimber]);
+
+    setTimberName("");
+    setTimberQty("");
+    setTimberPrice("");
   };
 
   const saveCustomer = () => {
-    if (!customerForm.name) return;
+    if (
+      !customerName ||
+      !customerPhone ||
+      !customerAmount ||
+      !paidAmount
+    )
+      return;
 
-    setCustomers([...customers, customerForm]);
+    const pending = Number(customerAmount) - Number(paidAmount);
 
-    setCustomerForm({
-      name: "",
-      phone: "",
-      pending: "",
-    });
+    const newCustomer = {
+      serial: customerData.length + 1,
+      name: customerName,
+      phone: customerPhone,
+      amount: customerAmount,
+      paid: paidAmount,
+      pending: pending,
+    };
+
+    setCustomerData([...customerData, newCustomer]);
+
+    setCustomerName("");
+    setCustomerPhone("");
+    setCustomerAmount("");
+    setPaidAmount("");
   };
 
-  const deletePaint = (index) => {
-    setPaints(paints.filter((_, i) => i !== index));
-  };
+  // ================= SEARCH FILTER =================
 
-  const deleteTimber = (index) => {
-    setTimbers(timbers.filter((_, i) => i !== index));
-  };
+  const filteredPaint = paintData.filter((item) =>
+    item.name.toLowerCase().includes(paintSearch.toLowerCase())
+  );
 
-  const deleteCustomer = (index) => {
-    setCustomers(customers.filter((_, i) => i !== index));
-  };
+  const filteredTimber = timberData.filter((item) =>
+    item.name.toLowerCase().includes(timberSearch.toLowerCase())
+  );
 
-  const whatsappCustomer = (customer) => {
-    const msg = `Hello ${customer.name},
-Your pending payment is ₹${customer.pending}
+  const filteredCustomer = customerData.filter((item) =>
+    item.name.toLowerCase().includes(customerSearch.toLowerCase())
+  );
 
-${BUSINESS_NAME}
-${PHONE}`;
+  // ================= TOTALS =================
 
-    window.open(
-      `https://wa.me/${customer.phone.replace(
-        /\D/g,
-        ""
-      )}?text=${encodeURIComponent(msg)}`,
-      "_blank"
-    );
-  };
+  const totalProducts =
+    paintData.length + timberData.length;
 
-  const callCustomer = (customer) => {
-    window.open(`tel:${customer.phone}`);
-  };
+  const totalPending = customerData.reduce(
+    (total, item) => total + item.pending,
+    0
+  );
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        background: "#0f172a",
-        fontFamily: "Arial",
-      }}
-    >
-      {/* SIDEBAR */}
+    <div style={styles.container}>
+      {/* ================= SIDEBAR ================= */}
 
-      <div
-        style={{
-          width: "300px",
-          background: "#1e3a8a",
-          padding: "20px",
-          color: "white",
-        }}
-      >
+      <div style={styles.sidebar}>
         <img
-          src="https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg"
-          style={{
-            width: "100%",
-            height: "180px",
-            objectFit: "cover",
-            borderRadius: "20px",
-          }}
+          src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
+          alt=""
+          style={styles.sidebarImage}
         />
 
-        <h1
-          style={{
-            textAlign: "center",
-            marginTop: "20px",
-            fontSize: "24px",
-            lineHeight: "40px",
-          }}
-        >
+        <h1 style={styles.sidebarTitle}>
           MAHALESHWAR PAINTS AND TIMBERS
         </h1>
 
-        <h2 style={{ textAlign: "center" }}>{OWNER}</h2>
+        <h2 style={styles.owner}>SATISH SAINI</h2>
 
-        <button style={menuBtn} onClick={() => setPage("dashboard")}>
+        <button style={styles.sidebarBtn}>
           Dashboard
         </button>
 
-        <button style={menuBtn} onClick={() => setPage("customers")}>
+        <button style={styles.sidebarBtn}>
           Customers
         </button>
       </div>
 
-      {/* MAIN */}
+      {/* ================= MAIN ================= */}
 
-      <div
-        style={{
-          flex: 1,
-          background: "#e5e7eb",
-          padding: "20px",
-          overflowX: "hidden",
-        }}
-      >
+      <div style={styles.main}>
         {/* HEADER */}
 
-        <div
-          style={{
-            background:
-              "linear-gradient(to right,#2563eb,#d97706)",
-            padding: "40px",
-            borderRadius: "25px",
-            textAlign: "center",
-            color: "white",
-          }}
-        >
-          <h1
-            style={{
-              margin: 0,
-              fontSize: "34px",
-              lineHeight: "50px",
-              fontWeight: "bold",
-            }}
-          >
-            {BUSINESS_NAME}
+        <div style={styles.header}>
+          <h1 style={styles.headerTitle}>
+            MAHALESHWAR PAINTS AND TIMBERS
           </h1>
 
-          <h2>👤 {OWNER}</h2>
+          <h2>
+            Owner: SATISH SAINI | +91 9828087208
+          </h2>
 
-          <h2>📞 {PHONE}</h2>
-
-          <h3>📍 {LOCATION}</h3>
+          <h3>Jaipur</h3>
         </div>
 
-        {/* DASHBOARD */}
+        {/* SECTION CARDS */}
 
-        {page === "dashboard" && (
-          <>
-            <div
-              style={{
-                display: "flex",
-                gap: "20px",
-                marginTop: "25px",
-                flexWrap: "wrap",
-              }}
-            >
-              {/* PAINT */}
+        <div style={styles.cardContainer}>
+          <div style={styles.card}>
+            <img
+              src="https://images.unsplash.com/photo-1504307651254-35680f356dfd"
+              alt=""
+              style={styles.cardImage}
+            />
 
-              <div
-                style={{
-                  flex: 1,
-                  minWidth: "300px",
-                  position: "relative",
-                }}
-              >
-                <img
-                  src="https://images.pexels.com/photos/6474475/pexels-photo-6474475.jpeg"
-                  style={{
-                    width: "100%",
-                    height: "320px",
-                    objectFit: "cover",
-                    borderRadius: "25px",
-                  }}
-                />
-
-                <button
-                  onClick={() => setPage("paint")}
-                  style={{
-                    position: "absolute",
-                    bottom: "20px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    padding: "18px 35px",
-                    border: "none",
-                    borderRadius: "20px",
-                    background: "#2563eb",
-                    color: "white",
-                    fontSize: "26px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  🎨 Paint Section
-                </button>
-              </div>
-
-              {/* TIMBER */}
-
-              <div
-                style={{
-                  flex: 1,
-                  minWidth: "300px",
-                  position: "relative",
-                }}
-              >
-                <img
-                  src="https://images.pexels.com/photos/5974339/pexels-photo-5974339.jpeg"
-                  style={{
-                    width: "100%",
-                    height: "320px",
-                    objectFit: "cover",
-                    borderRadius: "25px",
-                  }}
-                />
-
-                <button
-                  onClick={() => setPage("timber")}
-                  style={{
-                    position: "absolute",
-                    bottom: "20px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    padding: "18px 35px",
-                    border: "none",
-                    borderRadius: "20px",
-                    background: "#d97706",
-                    color: "white",
-                    fontSize: "26px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  🪵 Timber Section
-                </button>
-              </div>
-            </div>
-
-            {/* STATS */}
-
-            <div
-              style={{
-                display: "flex",
-                gap: "20px",
-                marginTop: "35px",
-                flexWrap: "wrap",
-              }}
-            >
-              <div
-                style={{
-                  ...card,
-                  borderTop: "8px solid #2563eb",
-                }}
-              >
-                <h2 style={{ color: "#111827" }}>
-                  Total Products
-                </h2>
-
-                <h1
-                  style={{
-                    color: "#2563eb",
-                    fontSize: "55px",
-                  }}
-                >
-                  {totalProducts}
-                </h1>
-              </div>
-
-              <div
-                style={{
-                  ...card,
-                  borderTop: "8px solid green",
-                }}
-              >
-                <h2 style={{ color: "#111827" }}>
-                  Customers
-                </h2>
-
-                <h1
-                  style={{
-                    color: "green",
-                    fontSize: "55px",
-                  }}
-                >
-                  {customers.length}
-                </h1>
-              </div>
-
-              <div
-                style={{
-                  ...card,
-                  borderTop: "8px solid red",
-                }}
-              >
-                <h2 style={{ color: "#111827" }}>
-                  Pending Payment
-                </h2>
-
-                <h1
-                  style={{
-                    color: "red",
-                    fontSize: "55px",
-                  }}
-                >
-                  ₹{totalPending}
-                </h1>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* PAINT SECTION */}
-
-        {page === "paint" && (
-          <>
-            <h1 style={headingBlue}>
+            <button style={styles.paintBtn}>
               🎨 Paint Section
-            </h1>
-
-            <input
-              placeholder="Paint Name"
-              style={input}
-              value={paintForm.name}
-              onChange={(e) =>
-                setPaintForm({
-                  ...paintForm,
-                  name: e.target.value,
-                })
-              }
-            />
-
-            <input
-              placeholder="Quantity"
-              style={input}
-              value={paintForm.quantity}
-              onChange={(e) =>
-                setPaintForm({
-                  ...paintForm,
-                  quantity: e.target.value,
-                })
-              }
-            />
-
-            <input
-              placeholder="Price"
-              style={input}
-              value={paintForm.price}
-              onChange={(e) =>
-                setPaintForm({
-                  ...paintForm,
-                  price: e.target.value,
-                })
-              }
-            />
-
-            <button style={saveBtn} onClick={savePaint}>
-              Save Paint
             </button>
+          </div>
 
-            {paints.map((item, index) => (
-              <div key={index} style={listCard}>
-                <h2>{item.name}</h2>
+          <div style={styles.card}>
+            <img
+              src="https://images.unsplash.com/photo-1513694203232-719a280e022f"
+              alt=""
+              style={styles.cardImage}
+            />
 
-                <p>Quantity: {item.quantity}</p>
-
-                <p>Price: ₹{item.price}</p>
-
-                <button
-                  style={deleteBtn}
-                  onClick={() => deletePaint(index)}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
-          </>
-        )}
-
-        {/* TIMBER */}
-
-        {page === "timber" && (
-          <>
-            <h1 style={headingOrange}>
+            <button style={styles.timberBtn}>
               🪵 Timber Section
-            </h1>
-
-            <input
-              placeholder="Timber Name"
-              style={input}
-              value={timberForm.name}
-              onChange={(e) =>
-                setTimberForm({
-                  ...timberForm,
-                  name: e.target.value,
-                })
-              }
-            />
-
-            <input
-              placeholder="Quantity"
-              style={input}
-              value={timberForm.quantity}
-              onChange={(e) =>
-                setTimberForm({
-                  ...timberForm,
-                  quantity: e.target.value,
-                })
-              }
-            />
-
-            <input
-              placeholder="Price"
-              style={input}
-              value={timberForm.price}
-              onChange={(e) =>
-                setTimberForm({
-                  ...timberForm,
-                  price: e.target.value,
-                })
-              }
-            />
-
-            <button style={saveBtn} onClick={saveTimber}>
-              Save Timber
             </button>
+          </div>
+        </div>
 
-            {timbers.map((item, index) => (
-              <div key={index} style={listCard}>
-                <h2>{item.name}</h2>
+        {/* TOTAL BOXES */}
 
-                <p>Quantity: {item.quantity}</p>
+        <div style={styles.totalContainer}>
+          <div style={styles.totalBoxBlue}>
+            <h2>Total Products</h2>
+            <h1>{totalProducts}</h1>
+          </div>
 
-                <p>Price: ₹{item.price}</p>
+          <div style={styles.totalBoxGreen}>
+            <h2>Customers</h2>
+            <h1>{customerData.length}</h1>
+          </div>
 
-                <button
-                  style={deleteBtn}
-                  onClick={() => deleteTimber(index)}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
-          </>
-        )}
+          <div style={styles.totalBoxRed}>
+            <h2>Pending Payment</h2>
+            <h1>₹{totalPending}</h1>
+          </div>
+        </div>
 
-        {/* CUSTOMERS */}
+        {/* ================= PAINT SECTION ================= */}
 
-        {page === "customers" && (
-          <>
-            <h1 style={headingGreen}>
-              👥 Customers
-            </h1>
+        <div style={styles.section}>
+          <h1 style={styles.blueHeading}>
+            🎨 Paint Section
+          </h1>
 
-            <input
-              placeholder="Customer Name"
-              style={input}
-              value={customerForm.name}
-              onChange={(e) =>
-                setCustomerForm({
-                  ...customerForm,
-                  name: e.target.value,
-                })
-              }
-            />
+          {/* SEARCH */}
 
-            <input
-              placeholder="Phone Number"
-              style={input}
-              value={customerForm.phone}
-              onChange={(e) =>
-                setCustomerForm({
-                  ...customerForm,
-                  phone: e.target.value,
-                })
-              }
-            />
+          <input
+            type="text"
+            placeholder="Search Paint..."
+            value={paintSearch}
+            onChange={(e) =>
+              setPaintSearch(e.target.value)
+            }
+            style={styles.search}
+          />
 
-            <input
-              placeholder="Pending Amount"
-              style={input}
-              value={customerForm.pending}
-              onChange={(e) =>
-                setCustomerForm({
-                  ...customerForm,
-                  pending: e.target.value,
-                })
-              }
-            />
+          {/* INPUTS */}
 
-            <button style={saveBtn} onClick={saveCustomer}>
-              Save Customer
-            </button>
+          <input
+            type="text"
+            placeholder="Paint Name"
+            value={paintName}
+            onChange={(e) =>
+              setPaintName(e.target.value)
+            }
+            style={styles.input}
+          />
 
-            {customers.map((customer, index) => (
-              <div key={index} style={listCard}>
-                <h2>{customer.name}</h2>
+          <input
+            type="number"
+            placeholder="Quantity"
+            value={paintQty}
+            onChange={(e) =>
+              setPaintQty(e.target.value)
+            }
+            style={styles.input}
+          />
 
-                <p>{customer.phone}</p>
+          <input
+            type="number"
+            placeholder="Price"
+            value={paintPrice}
+            onChange={(e) =>
+              setPaintPrice(e.target.value)
+            }
+            style={styles.input}
+          />
 
-                <h3 style={{ color: "red" }}>
-                  Pending ₹{customer.pending}
-                </h3>
+          <button
+            onClick={savePaint}
+            style={styles.saveBtn}
+          >
+            Save Paint
+          </button>
 
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <button
-                    style={{
-                      ...actionBtn,
-                      background: "green",
-                    }}
-                    onClick={() =>
-                      whatsappCustomer(customer)
-                    }
-                  >
-                    WhatsApp
-                  </button>
+          {/* TABLE */}
 
-                  <button
-                    style={{
-                      ...actionBtn,
-                      background: "#2563eb",
-                    }}
-                    onClick={() =>
-                      callCustomer(customer)
-                    }
-                  >
-                    Call
-                  </button>
+          <div style={styles.tableWrapper}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th>Sr No.</th>
+                  <th>Paint Name</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
 
-                  <button
-                    style={deleteBtn}
-                    onClick={() =>
-                      deleteCustomer(index)
-                    }
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </>
-        )}
+              <tbody>
+                {filteredPaint.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.serial}</td>
+                    <td>{item.name}</td>
+                    <td>{item.qty}</td>
+                    <td>₹{item.price}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* ================= TIMBER SECTION ================= */}
+
+        <div style={styles.section}>
+          <h1 style={styles.orangeHeading}>
+            🪵 Timber Section
+          </h1>
+
+          {/* SEARCH */}
+
+          <input
+            type="text"
+            placeholder="Search Timber..."
+            value={timberSearch}
+            onChange={(e) =>
+              setTimberSearch(e.target.value)
+            }
+            style={styles.search}
+          />
+
+          {/* INPUTS */}
+
+          <input
+            type="text"
+            placeholder="Timber Name"
+            value={timberName}
+            onChange={(e) =>
+              setTimberName(e.target.value)
+            }
+            style={styles.input}
+          />
+
+          <input
+            type="number"
+            placeholder="Quantity"
+            value={timberQty}
+            onChange={(e) =>
+              setTimberQty(e.target.value)
+            }
+            style={styles.input}
+          />
+
+          <input
+            type="number"
+            placeholder="Price"
+            value={timberPrice}
+            onChange={(e) =>
+              setTimberPrice(e.target.value)
+            }
+            style={styles.input}
+          />
+
+          <button
+            onClick={saveTimber}
+            style={styles.saveBtn}
+          >
+            Save Timber
+          </button>
+
+          {/* TABLE */}
+
+          <div style={styles.tableWrapper}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th>Sr No.</th>
+                  <th>Timber Name</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredTimber.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.serial}</td>
+                    <td>{item.name}</td>
+                    <td>{item.qty}</td>
+                    <td>₹{item.price}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* ================= CUSTOMER SECTION ================= */}
+
+        <div style={styles.section}>
+          <h1 style={styles.greenHeading}>
+            👨 Customer Section
+          </h1>
+
+          {/* SEARCH */}
+
+          <input
+            type="text"
+            placeholder="Search Customer..."
+            value={customerSearch}
+            onChange={(e) =>
+              setCustomerSearch(e.target.value)
+            }
+            style={styles.search}
+          />
+
+          {/* INPUTS */}
+
+          <input
+            type="text"
+            placeholder="Customer Name"
+            value={customerName}
+            onChange={(e) =>
+              setCustomerName(e.target.value)
+            }
+            style={styles.input}
+          />
+
+          <input
+            type="number"
+            placeholder="Phone Number"
+            value={customerPhone}
+            onChange={(e) =>
+              setCustomerPhone(e.target.value)
+            }
+            style={styles.input}
+          />
+
+          <input
+            type="number"
+            placeholder="Total Amount"
+            value={customerAmount}
+            onChange={(e) =>
+              setCustomerAmount(e.target.value)
+            }
+            style={styles.input}
+          />
+
+          <input
+            type="number"
+            placeholder="Paid Amount"
+            value={paidAmount}
+            onChange={(e) =>
+              setPaidAmount(e.target.value)
+            }
+            style={styles.input}
+          />
+
+          <button
+            onClick={saveCustomer}
+            style={styles.saveBtn}
+          >
+            Save Customer
+          </button>
+
+          {/* TABLE */}
+
+          <div style={styles.tableWrapper}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th>Sr No.</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Total</th>
+                  <th>Paid</th>
+                  <th>Pending</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredCustomer.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.serial}</td>
+                    <td>{item.name}</td>
+                    <td>{item.phone}</td>
+                    <td>₹{item.amount}</td>
+                    <td>₹{item.paid}</td>
+                    <td>₹{item.pending}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-const menuBtn = {
-  width: "100%",
-  padding: "18px",
-  border: "none",
-  borderRadius: "15px",
-  background: "#2563eb",
-  color: "white",
-  fontSize: "24px",
-  marginTop: "15px",
-  cursor: "pointer",
-  fontWeight: "bold",
-};
+// ====================== STYLES ======================
 
-const input = {
-  width: "calc(100% - 40px)",
-  boxSizing: "border-box",
-  padding: "16px",
-  marginTop: "15px",
-  borderRadius: "12px",
-  border: "1px solid gray",
-  fontSize: "18px",
-  background: "#3f3f46",
-  color: "white",
-  display: "block",
-};
+const styles = {
+  container: {
+    display: "flex",
+    minHeight: "100vh",
+    background: "#0f172a",
+    fontFamily: "Arial",
+  },
 
-const saveBtn = {
-  marginTop: "20px",
-  padding: "15px 30px",
-  border: "none",
-  borderRadius: "12px",
-  background: "green",
-  color: "white",
-  fontSize: "20px",
-  cursor: "pointer",
-};
+  sidebar: {
+    width: "300px",
+    background: "#1e3a8a",
+    padding: "20px",
+    color: "white",
+    textAlign: "center",
+  },
 
-const deleteBtn = {
-  padding: "10px 20px",
-  border: "none",
-  borderRadius: "10px",
-  background: "red",
-  color: "white",
-  cursor: "pointer",
-  marginTop: "10px",
-};
+  sidebarImage: {
+    width: "100%",
+    borderRadius: "20px",
+  },
 
-const actionBtn = {
-  padding: "10px 20px",
-  border: "none",
-  borderRadius: "10px",
-  color: "white",
-  cursor: "pointer",
-};
+  sidebarTitle: {
+    marginTop: "20px",
+    fontSize: "38px",
+    fontWeight: "bold",
+  },
 
-const listCard = {
-  background: "white",
-  padding: "20px",
-  borderRadius: "15px",
-  marginTop: "20px",
-};
+  owner: {
+    marginTop: "20px",
+  },
 
-const card = {
-  flex: 1,
-  minWidth: "220px",
-  background: "white",
-  padding: "30px",
-  borderRadius: "20px",
-  textAlign: "center",
-  boxShadow: "0 5px 15px rgba(0,0,0,0.15)",
-};
+  sidebarBtn: {
+    width: "100%",
+    padding: "15px",
+    marginTop: "20px",
+    borderRadius: "12px",
+    border: "none",
+    background: "#2563eb",
+    color: "white",
+    fontSize: "20px",
+    fontWeight: "bold",
+    cursor: "pointer",
+  },
 
-const headingBlue = {
-  color: "#2563eb",
-  fontSize: "48px",
-  fontWeight: "bold",
-  marginBottom: "25px",
-  textAlign: "center",
-};
+  main: {
+    flex: 1,
+    background: "#e5e7eb",
+    padding: "20px",
+  },
 
-const headingOrange = {
-  color: "#d97706",
-  fontSize: "48px",
-  fontWeight: "bold",
-  marginBottom: "25px",
-  textAlign: "center",
-};
+  header: {
+    background:
+      "linear-gradient(to right,#2563eb,#d97706)",
+    padding: "30px",
+    borderRadius: "20px",
+    color: "white",
+    textAlign: "center",
+  },
 
-const headingGreen = {
-  color: "#059669",
-  fontSize: "48px",
-  fontWeight: "bold",
-  marginBottom: "25px",
-  textAlign: "center",
+  headerTitle: {
+    fontSize: "48px",
+  },
+
+  cardContainer: {
+    display: "flex",
+    gap: "20px",
+    marginTop: "30px",
+    flexWrap: "wrap",
+  },
+
+  card: {
+    position: "relative",
+    width: "350px",
+  },
+
+  cardImage: {
+    width: "100%",
+    height: "300px",
+    objectFit: "cover",
+    borderRadius: "20px",
+  },
+
+  paintBtn: {
+    position: "absolute",
+    bottom: "20px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    padding: "15px 30px",
+    border: "none",
+    borderRadius: "15px",
+    background: "#2563eb",
+    color: "white",
+    fontSize: "24px",
+    fontWeight: "bold",
+  },
+
+  timberBtn: {
+    position: "absolute",
+    bottom: "20px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    padding: "15px 30px",
+    border: "none",
+    borderRadius: "15px",
+    background: "#d97706",
+    color: "white",
+    fontSize: "24px",
+    fontWeight: "bold",
+  },
+
+  totalContainer: {
+    display: "flex",
+    gap: "20px",
+    marginTop: "30px",
+    flexWrap: "wrap",
+  },
+
+  totalBoxBlue: {
+    flex: 1,
+    minWidth: "220px",
+    background: "white",
+    padding: "30px",
+    borderRadius: "20px",
+    borderTop: "6px solid #2563eb",
+    textAlign: "center",
+  },
+
+  totalBoxGreen: {
+    flex: 1,
+    minWidth: "220px",
+    background: "white",
+    padding: "30px",
+    borderRadius: "20px",
+    borderTop: "6px solid #059669",
+    textAlign: "center",
+  },
+
+  totalBoxRed: {
+    flex: 1,
+    minWidth: "220px",
+    background: "white",
+    padding: "30px",
+    borderRadius: "20px",
+    borderTop: "6px solid red",
+    textAlign: "center",
+  },
+
+  section: {
+    background: "white",
+    marginTop: "40px",
+    padding: "30px",
+    borderRadius: "20px",
+  },
+
+  blueHeading: {
+    color: "#2563eb",
+    fontSize: "45px",
+    textAlign: "center",
+  },
+
+  orangeHeading: {
+    color: "#d97706",
+    fontSize: "45px",
+    textAlign: "center",
+  },
+
+  greenHeading: {
+    color: "#059669",
+    fontSize: "45px",
+    textAlign: "center",
+  },
+
+  search: {
+    width: "100%",
+    padding: "15px",
+    marginTop: "20px",
+    borderRadius: "10px",
+    border: "2px solid #cbd5e1",
+    fontSize: "18px",
+    boxSizing: "border-box",
+  },
+
+  input: {
+    width: "100%",
+    padding: "15px",
+    marginTop: "20px",
+    borderRadius: "10px",
+    border: "2px solid #cbd5e1",
+    fontSize: "18px",
+    boxSizing: "border-box",
+  },
+
+  saveBtn: {
+    marginTop: "20px",
+    padding: "15px 30px",
+    border: "none",
+    borderRadius: "12px",
+    background: "green",
+    color: "white",
+    fontSize: "20px",
+    fontWeight: "bold",
+    cursor: "pointer",
+  },
+
+  tableWrapper: {
+    overflowX: "auto",
+    marginTop: "30px",
+  },
+
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+  },
 };
